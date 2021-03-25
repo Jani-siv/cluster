@@ -1,7 +1,13 @@
 #include "server.h"
+#include <thread>
 int main()
 {
-    server *firstServer = new server();
-    firstServer->acceptCall();
+    //class for server
+    server newServer;
+    //thread taking incoming traffic
+    std::thread testThread(&server::acceptCall,newServer);
+    //join thread
+    testThread.join();
+
     return 0;
 }
