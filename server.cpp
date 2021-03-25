@@ -1,6 +1,7 @@
 #include "server.h"
 #include <iostream>
 
+
 server::server(/* args */)
 {
     server::createSocket();
@@ -81,10 +82,13 @@ void server::markSocketToListening()
 
 void server::acceptCall()
 {
-    while(true)
+    char data[1025] = "hello this is server";
+    while(this->runServer == true)
     {
     std::cout<<"Waiting connections"<<std::endl;
     //client socket number is unique
+    //thread to get commands from server
+    std::thread getMessage(&server::menu,this);
     this->clientSocket = accept(this->listening,(sockaddr*)&this->client,&this->clientsize);
 
     if (clientSocket == -1)
@@ -93,5 +97,46 @@ void server::acceptCall()
         server::errorNumber = -4;
     }
     this->setConnectionId(clientSocket);
+    if (this->connectionsNumber >= 2)
+    {
+        for (int k=0; k<2; k++)
+        {
+            write(connectionId[k],data,strlen(data));
+        }
+    }
+
+    getMessage.join();
+    }
+    
+}
+void  server::handleConnection()
+{
+while (this->command == 0)
+{
+
+}
+
+}
+
+void server::menu()
+{
+    int testi;
+    std::cout<<"Menu:"<<std::endl;
+    std::cout<<"1 Turn off server"<<std::endl;
+    std::cout<<"2 other options"<<std::endl;
+    std::cin>>testi;
+
+    this->setCommand(testi);
+    if (testi == 1)
+    {
+        //break accept
+    }
+}
+
+void server::setCommand(int command)
+{
+    if (command == 1)
+    {
+        this->runServer = false;
     }
 }

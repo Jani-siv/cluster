@@ -14,6 +14,8 @@
 #include <string>
 #include <thread>
 #include <iostream>
+#include "clientClass.h"
+#include <pthread.h>
 
 class server
 {
@@ -24,12 +26,14 @@ class server
 private:
 //error handling
 int errorNumber = 0;
+bool runServer = true;
 //mitä serverin täytyy säilyttää
 //socket address struct hint
 sockaddr_in hint;
 //client object
 int connectionId[100];
 int connectionsNumber =0;
+int command = 0;
 //socket
 int listening;
 //ip address
@@ -51,12 +55,14 @@ public:
     void markSocketToListening();
     //accept a call
     void acceptCall();
-    //close the listening socket
+    //handle connection
+    void handleConnection();
     //while receive display message echo message
     //close socket
 
     void setConnectionId(int clientSocket);
-    
+    void menu();
+    void setCommand(int command);
 
 };
 

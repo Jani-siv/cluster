@@ -1,13 +1,14 @@
 CXX = g++
-OBJS = main.cpp server.cpp
+OBJS = main.cpp server.cpp clientClass.cpp
 CXXFLAGS = -Wall 
-CONF = `sdl2-config --cflags --libs`
+CONF = -pthread
 
 engine: $(OBJS)
 				$(CXX) -o build/server $(OBJS) $(CXXFLAGS) $(CONF) 
 
 main.cpp:server.h
-server.cpp::server.h
+server.cpp::server.h clientClass.h
+clientClass.cpp:: clientClass.h
 
 clean:
 		$(RM) game $(OBJS)
