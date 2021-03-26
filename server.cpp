@@ -183,21 +183,25 @@ void server::checkAliveClient()
     
     int getAliveConnections[100];
     char buffer[4000];
+    char testMessage[2] = "0";
     memset(getAliveConnections,0,sizeof(getAliveConnections));
     while (this->runServer == true)
     {
     for (int i = 0; i < this->connectionsNumber; i++)
     {
         //send test message to test is client online
-    alive = recv(this->connectionId[i],buffer,sizeof(buffer),MSG_DONTWAIT);
-        if (alive != -1)
+    alive = send(this->connectionId[i],testMessage, sizeof(testMessage), NULL);
+        //wait answer
+      alive = recv(this->connectionId[i],buffer,sizeof(buffer),NULL);
+    
+        if (alive > 0)
         {
             //connection is alive
             getAliveConnections[hope] = this->connectionId[i];      
             hope++;          
         }
         //close inactive connection
-        if (alive == -1)
+        if (alive < 0)
         {
             close(connectionId[i]);
         }
