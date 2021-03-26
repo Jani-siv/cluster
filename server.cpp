@@ -190,9 +190,9 @@ void server::checkAliveClient()
     for (int i = 0; i < this->connectionsNumber; i++)
     {
         //send test message to test is client online
-    alive = send(this->connectionId[i],testMessage, sizeof(testMessage), NULL);
+      send(this->connectionId[i],testMessage, sizeof(testMessage), 0);
         //wait answer
-      alive = recv(this->connectionId[i],buffer,sizeof(buffer),NULL);
+      alive = recv(this->connectionId[i],buffer,sizeof(buffer),MSG_DONTWAIT);
     
         if (alive > 0)
         {
