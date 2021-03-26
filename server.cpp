@@ -123,10 +123,15 @@ void server::acceptCall()
 
 void server::startServer()
 {
+    //incoming connections thread
     std::thread t_listener(&server::acceptCall, this);
+    //menu thread
     std::thread t_menu(&server::startMenu,this);
+    //check alive clients thread
+    std::thread t_alive(&server::checkAliveClient,this);
     t_listener.join();
     t_menu.join();
+    t_alive.join();
     std::cout<<"server is down"<<std::endl;
 }
 
@@ -165,4 +170,51 @@ serv_addr.sin_port = htons(2500);
 // Converting IPv4 and IPv6 addresses from text to binary form
 inet_pton ( AF_INET, "127.0.0.1", &serv_addr.sin_addr);
 connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr ));
+}
+
+void server::checkAliveClient()
+{
+    int alive, hope = 0;
+    char message[2] = "0";
+    int aliveConnections[100];
+    memset(aliveConnections,0,sizeof(aliveConnections));
+    while (this->runServer == true)
+    {
+        std::cout<<"begin of while loop"<<std::endl;
+    for (int i = 0; i < 100; i++)
+    {
+        //send test message to test is client online
+    alive = send(this->connectionId[i],"0",strlen(message), 0);
+        if (alive != -1)
+        {
+            //connection is alive
+            aliveConnections[hope] = this->connectionId[i];      
+            hope++;          
+        }
+        
+    }
+    std::cout<<"all alive tested"<<std::endl;
+    //clear dead connections
+   // memset(this->connectionId,0,sizeof(this->connectionId));
+    //copy alive connections
+ if (hope != this->connectionsNumber)
+    {
+   for (int k=0; k< 100; k++)
+   {
+    this->connectionId[k] = aliveConnections[k];
+   }
+   std::cout<<"all connection copied"<<std::endl;
+    //update numbers of active connections
+   
+        //hope--;
+    this->connectionsNumber = hope;
+    }
+    
+    hope = 0;
+    memset(aliveConnections,0,sizeof(aliveConnections));
+    std::cout<<"active clients: "<<this->connectionsNumber<<std::endl;
+
+    //break for 1 minute before next check
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
 }

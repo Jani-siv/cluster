@@ -66,7 +66,7 @@ public:
   //  void menu();
     void executeCommand();
     void killConnection();
-
+    void checkAliveClient();
 };
 
 
