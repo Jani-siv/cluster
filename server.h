@@ -16,6 +16,7 @@
 #include <iostream>
 #include "clientClass.h"
 #include <pthread.h>
+#include "menu.h"
 
 class server
 {
@@ -25,6 +26,7 @@ class server
 
 private:
 //error handling
+menu *serverMenu = new menu;
 int errorNumber = 0;
 bool runServer = true;
 //mitä serverin täytyy säilyttää
@@ -55,14 +57,14 @@ public:
     void markSocketToListening();
     //accept a call
     void acceptCall();
-    //handle connection
-    void handleConnection();
+
     //while receive display message echo message
     //close socket
-
+    void startServer();
+    void startMenu();
     void setConnectionId(int clientSocket);
-    void menu();
-    void setCommand(int command);
+  //  void menu();
+    void executeCommand();;
 
 };
 
