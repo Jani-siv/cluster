@@ -64,7 +64,8 @@ public:
     void startMenu();
     void setConnectionId(int clientSocket);
   //  void menu();
-    void executeCommand();;
+    void executeCommand();
+    void killConnection();
 
 };
 

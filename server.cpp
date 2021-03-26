@@ -144,5 +144,17 @@ void server::executeCommand()
         { 
             this->runServer = false;
             //make connection in server to kill other thread;    
+            this->killConnection();
         }
+}
+void server::killConnection()
+{
+int obj_socket = 0;
+struct sockaddr_in serv_addr;
+obj_socket = socket (AF_INET, SOCK_STREAM, 0 );
+serv_addr.sin_family = AF_INET;
+serv_addr.sin_port = htons(2500);
+// Converting IPv4 and IPv6 addresses from text to binary form
+inet_pton ( AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr ));
 }
