@@ -85,7 +85,7 @@ void server::acceptCall()
 
     //left here only listening part and move all others in own thread
     //message to connecting client
-    char data[1025] = "hello this is server";
+    char data[1025] = "hello this is server wait my commands ;)";
     while(this->runServer == true)
     {
     //remove all messages to gui
@@ -110,6 +110,13 @@ void server::acceptCall()
         }
     }
     }
+    //close all sockets
+    for (int i =0; i < this->connectionsNumber; i++)
+    {
+        close(this->connectionId[i]);
+        std::cout<<"connection id: "<<this->connectionId[i]<<" is closed"<<std::endl;
+
+    }
     
 }
 
@@ -120,6 +127,7 @@ void server::startServer()
     std::thread t_menu(&server::startMenu,this);
     t_listener.join();
     t_menu.join();
+    std::cout<<"server is down"<<std::endl;
 }
 
 void server::startMenu()
