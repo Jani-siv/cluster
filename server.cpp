@@ -82,13 +82,16 @@ void server::markSocketToListening()
 
 void server::acceptCall()
 {
-    char data[1025] = "hello this is server";
+
+    //left here only listening part and move all others in own thread
+    //message to connecting client
+    char data[1025] = "hello this is server wait my commands ;)";
     while(this->runServer == true)
     {
+    //remove all messages to gui
     std::cout<<"Waiting connections"<<std::endl;
     //client socket number is unique
-    //thread to get commands from server
-    std::thread getMessage(&server::menu,this);
+    //thread to get commands from server move this also
     this->clientSocket = accept(this->listening,(sockaddr*)&this->client,&this->clientsize);
 
     if (clientSocket == -1)
@@ -96,6 +99,8 @@ void server::acceptCall()
         std::cout<<"Error with client connection"<<std::endl;
         server::errorNumber = -4;
     }
+
+    //register client 
     this->setConnectionId(clientSocket);
     if (this->connectionsNumber >= 2)
     {
@@ -104,39 +109,60 @@ void server::acceptCall()
             write(connectionId[k],data,strlen(data));
         }
     }
+    }
+    //close all sockets
+    for (int i =0; i < this->connectionsNumber; i++)
+    {
+        close(this->connectionId[i]);
+        std::cout<<"connection id: "<<this->connectionId[i]<<" is closed"<<std::endl;
 
-    getMessage.join();
     }
     
 }
-void  server::handleConnection()
-{
-while (this->command == 0)
-{
 
+
+void server::startServer()
+{
+    std::thread t_listener(&server::acceptCall, this);
+    std::thread t_menu(&server::startMenu,this);
+    t_listener.join();
+    t_menu.join();
+    std::cout<<"server is down"<<std::endl;
 }
 
+void server::startMenu()
+{
+while (this->runServer == true)
+{
+    this->command = this->serverMenu->showMenu();
+    this->executeCommand();
+}
 }
 
-void server::menu()
+void server::executeCommand()
 {
-    int testi;
-    std::cout<<"Menu:"<<std::endl;
-    std::cout<<"1 Turn off server"<<std::endl;
-    std::cout<<"2 other options"<<std::endl;
-    std::cin>>testi;
-
-    this->setCommand(testi);
-    if (testi == 1)
-    {
-        //break accept
-    }
+    //show active nodes
+    if (this->command == 1) {this->runServer = false;}
+    //send command to nodes
+    if (this->command == 2) {this->runServer = false;}
+    //update nodes
+    if (this->command == 3) {this->runServer = false;}
+    //kill server
+    if (this->command == 4) 
+        { 
+            this->runServer = false;
+            //make connection in server to kill other thread;    
+            this->killConnection();
+        }
 }
-
-void server::setCommand(int command)
+void server::killConnection()
 {
-    if (command == 1)
-    {
-        this->runServer = false;
-    }
+int obj_socket = 0;
+struct sockaddr_in serv_addr;
+obj_socket = socket (AF_INET, SOCK_STREAM, 0 );
+serv_addr.sin_family = AF_INET;
+serv_addr.sin_port = htons(2500);
+// Converting IPv4 and IPv6 addresses from text to binary form
+inet_pton ( AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr ));
 }
