@@ -34,6 +34,7 @@ bool runServer = true;
 sockaddr_in hint;
 //client object
 int connectionId[100];
+int aliveConnection[100];
 int connectionsNumber =0;
 int command = 0;
 //socket

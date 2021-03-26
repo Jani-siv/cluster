@@ -137,6 +137,9 @@ void server::startServer()
 
 void server::startMenu()
 {
+//waiting other threads
+std::this_thread::sleep_for(std::chrono::seconds(1));
+
 while (this->runServer == true)
 {
     this->command = this->serverMenu->showMenu();
@@ -174,47 +177,55 @@ connect( obj_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr ));
 
 void server::checkAliveClient()
 {
+    //waiting other threads
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     int alive, hope = 0;
-    char message[2] = "0";
-    int aliveConnections[100];
-    memset(aliveConnections,0,sizeof(aliveConnections));
+    
+    int getAliveConnections[100];
+    char buffer[4000];
+    memset(getAliveConnections,0,sizeof(getAliveConnections));
     while (this->runServer == true)
     {
-        std::cout<<"begin of while loop"<<std::endl;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < this->connectionsNumber; i++)
     {
         //send test message to test is client online
-    alive = send(this->connectionId[i],"0",strlen(message), 0);
+    alive = recv(this->connectionId[i],buffer,sizeof(buffer),MSG_DONTWAIT);
         if (alive != -1)
         {
             //connection is alive
-            aliveConnections[hope] = this->connectionId[i];      
+            getAliveConnections[hope] = this->connectionId[i];      
             hope++;          
+        }
+        //close inactive connection
+        if (alive == -1)
+        {
+            close(connectionId[i]);
         }
         
     }
-    std::cout<<"all alive tested"<<std::endl;
-    //clear dead connections
-   // memset(this->connectionId,0,sizeof(this->connectionId));
-    //copy alive connections
- if (hope != this->connectionsNumber)
+   // std::cout<<"all alive tested"<<std::endl;
+   
+ if (hope != this->connectionsNumber && hope != 0)
     {
    for (int k=0; k< 100; k++)
    {
-    this->connectionId[k] = aliveConnections[k];
+    this->connectionId[k] = getAliveConnections[k];
    }
-   std::cout<<"all connection copied"<<std::endl;
+  // std::cout<<"all connection copied"<<std::endl;
     //update numbers of active connections
    
         //hope--;
     this->connectionsNumber = hope;
     }
-    
+    if (hope == 0 && this->connectionsNumber == 1)
+    {
+        this->connectionsNumber = 0;
+    }
     hope = 0;
-    memset(aliveConnections,0,sizeof(aliveConnections));
-    std::cout<<"active clients: "<<this->connectionsNumber<<std::endl;
+    memset(getAliveConnections,0,sizeof(getAliveConnections));
+   // std::cout<<"active clients: "<<this->connectionsNumber<<std::endl;
 
-    //break for 1 minute before next check
+    //break for 5 seconds before next check
     std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
