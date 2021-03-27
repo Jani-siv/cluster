@@ -17,6 +17,8 @@
 #include "clientClass.h"
 #include <pthread.h>
 #include "menu.h"
+#include <vector>
+#include "time.h"
 
 class server
 {
@@ -27,8 +29,11 @@ class server
 private:
 //error handling
 menu *serverMenu = new menu;
+
+std::vector<clientClass> clientContainer; 
 int errorNumber = 0;
 bool runServer = true;
+int clientId = 0;
 //mitä serverin täytyy säilyttää
 //socket address struct hint
 sockaddr_in hint;
