@@ -73,6 +73,8 @@ public:
     void executeCommand();
     void killConnection();
     void checkAliveClient();
+    void createClientThread();
+    void readClientMessages();
 };
 
 

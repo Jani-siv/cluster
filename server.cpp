@@ -133,6 +133,9 @@ void server::startServer()
     std::thread t_menu(&server::startMenu,this);
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
+    //start listening incoming clients
+    std::thread t_readMessages(&server::readClientMessages,this);
+    t_readMessages.join();
     t_listener.join();
     t_menu.join();
     t_alive.join();
@@ -204,6 +207,7 @@ void server::checkAliveClient()
                 send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
                 //close socket
                 close(client.getSocketId());
+                client.setOffline();
                 this->clientContainer.erase(this->clientContainer.begin()+position);
 
                 //delete object and delete from vector this object
@@ -213,4 +217,17 @@ void server::checkAliveClient()
     //break for 5 seconds before next check
     std::this_thread::sleep_for(std::chrono::seconds(5));
     }
+}
+void server::readClientMessages()
+{
+    while(this->runServer == true)
+    {
+    for (auto client : this->clientContainer)
+    {
+        if(client.getListening() == 0 && client.getStatus() == 1)
+        {
+            client.createThread();
+        }
+    }
+}
 }

@@ -3,6 +3,10 @@
 #include <iostream>
 #include <thread>
 #include <time.h>
+#include <thread>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <string>
 class clientClass
 {
     private:
@@ -11,6 +15,8 @@ class clientClass
     time_t onlineTimestamp;
     std::string Hostname;
     int online = 1;
+    char request[10];
+    int serverListening = 0;
 
     public:
     clientClass(std::string hostName, int socketId);
@@ -21,6 +27,11 @@ class clientClass
     time_t getTimestamp();
     int getSocketId();
     void setOffline();
+    void listenClientMessages();
+    void createThread();
+    void setListening();
+    int getListening();
+    int getStatus();
 };
 
 
