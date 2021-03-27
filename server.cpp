@@ -186,6 +186,8 @@ void server::checkAliveClient()
 {
     //waiting other threads
     std::this_thread::sleep_for(std::chrono::seconds(2));
+        
+    time_t clientTimestamp;
     while(this->runServer == true)
     {
     //check client timestamp
@@ -194,20 +196,25 @@ void server::checkAliveClient()
     char* connectionTimeOut = message;
     time(&timestamp);
     int position = 0;
-    //connection timeout
     timestamp -= 20;
-    time_t clientTimestamp;
+    //connection timeout
+
         for (auto client : this->clientContainer)
         {
             clientTimestamp = client.getTimestamp();
-            std::cout<<"client timestamp: "<<clientTimestamp<<std::endl;
+            std::cout<<"client timestamp: "<<client.getTimestamp()<<" client socketID: "<<client.getSocketId()<<std::endl;
             if (clientTimestamp <= timestamp )
             {
                 int socketID = client.getSocketId();
+                //set offline to kill thread inside client
+                client.setOffline();
+                std::cout<<"client Status is: "<<client.getStatus()<<std::endl;
+                //send message to kill thread
                 send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
                 //close socket
+                //wait until thread is killed in client
+                std::this_thread::sleep_for(std::chrono::seconds(2));
                 close(client.getSocketId());
-                client.setOffline();
                 this->clientContainer.erase(this->clientContainer.begin()+position);
 
                 //delete object and delete from vector this object

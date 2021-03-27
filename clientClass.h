@@ -14,7 +14,7 @@ class clientClass
     int socketId;
     time_t onlineTimestamp;
     std::string Hostname;
-    int online = 1;
+    int online;
     char request[10];
     int serverListening = 0;
 
@@ -32,6 +32,7 @@ class clientClass
     void setListening();
     int getListening();
     int getStatus();
+    void setOnline();
 };
 
 

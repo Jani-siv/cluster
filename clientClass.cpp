@@ -1,10 +1,11 @@
 #include "clientClass.h"
 clientClass::clientClass(std::string hostName, int socketId)
 {
-    clientClass::setTimestamp();
+    this->setTimestamp();
+    this->setOnline();
     std::cout<<"Client object created at:"<<this->onlineTimestamp<<std::endl;
-    clientClass::setSocketId(socketId);
-    clientClass::setHostName(hostName);
+    this->setSocketId(socketId);
+    this->setHostName(hostName);
    // clientClass::createThread();
 }
 
@@ -12,9 +13,15 @@ clientClass::~clientClass()
 {
 
 }
+
+void clientClass::setOnline()
+{
+    this->online = 1;
+}
 void clientClass::setTimestamp()
 {
     time(&this->onlineTimestamp);
+    std::cout<<"new timestamp set: "<<this->onlineTimestamp<<std::endl;
 }
 void clientClass::setSocketId(int socketId)
 {
@@ -35,6 +42,7 @@ int clientClass::getSocketId()
 void clientClass::setOffline()
 {
     this->online = 0;
+    std::cout<<"my thread is set offline"<<std::endl;
 }
 void clientClass::createThread()
 {
@@ -49,8 +57,11 @@ void clientClass::listenClientMessages()
     while(this->online == 1)
     {
      read(this->socketId,p_buffer,sizeof(this->request));
-     std::cout<<"i did read your message"<<std::endl;
-        time(&this->onlineTimestamp);
+     std::cout<<"i did read your message and my online timeStamp is: "<<this->onlineTimestamp<<" client socketId: "<<this->getSocketId()<<std::endl;
+        if (this->online == 1)
+        {
+        this->setTimestamp();
+        }
     }
     std::cout<<this->request<<std::endl;
 }
