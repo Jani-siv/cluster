@@ -1,7 +1,7 @@
-CXX = g++
+CXX = clang++
 OBJS = main.cpp server.cpp clientClass.cpp menu.cpp
 CXXFLAGS = -Wall 
-CONF = -pthread
+CONF = -pthread -lsupc++
 
 engine: $(OBJS)
 				$(CXX) -o build/server $(OBJS) $(CXXFLAGS) $(CONF) 

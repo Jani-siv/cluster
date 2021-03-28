@@ -6,7 +6,6 @@ clientClass::clientClass(std::string hostName, int socketId)
     std::cout<<"Client object created at:"<<this->onlineTimestamp<<std::endl;
     this->setSocketId(socketId);
     this->setHostName(hostName);
-   // clientClass::createThread();
 }
 
 clientClass::~clientClass()
@@ -51,6 +50,7 @@ void clientClass::createThread()
 }
 void clientClass::listenClientMessages()
 {
+    std::cout<<"this thread ID: "<<std::this_thread::get_id()<<std::endl;
     this->setListening();
     char* p_buffer = this->request;
 

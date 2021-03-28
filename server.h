@@ -29,7 +29,7 @@ class server
 private:
 //error handling
 menu *serverMenu = new menu;
-
+std::vector<std::thread> clientThread;
 std::vector<clientClass> clientContainer; 
 int errorNumber = 0;
 bool runServer = true;

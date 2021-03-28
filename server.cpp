@@ -108,7 +108,10 @@ void server::acceptCall()
             // get real host name
             std::string hostname = "hostname";
             //class for connection
+            //do i need create thread in here and follow that??? *************
             clientClass newClientConnection(hostname, clientSocket);
+            //std::thread testi(&clientClass clientClass,);
+            //this->clientThread.push_back(testi);
             this->setConnectionId(clientSocket);
             //push connection class to client container
             this->clientContainer.push_back(newClientConnection);
@@ -133,9 +136,9 @@ void server::startServer()
     std::thread t_menu(&server::startMenu,this);
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
-    //start listening incoming clients
-    std::thread t_readMessages(&server::readClientMessages,this);
-    t_readMessages.join();
+    //start listening incoming clients **this kind thread wont work***
+   // std::thread t_readMessages(&server::readClientMessages,this);
+  //  t_readMessages.join();
     t_listener.join();
     t_menu.join();
     t_alive.join();
@@ -227,13 +230,17 @@ void server::checkAliveClient()
 }
 void server::readClientMessages()
 {
+    std::cout<<"thread what read client messages"<<std::endl;
     while(this->runServer == true)
     {
     for (auto client : this->clientContainer)
     {
-        if(client.getListening() == 0 && client.getStatus() == 1)
+        if(client.getListening() == 0 ) //&& client.getStatus() == 1
         {
-            client.createThread();
+            std::cout<<"creating thread in server.cpp to id: "<<client.getSocketId()<<std::endl;
+            //trying create new thread and maybe set that in vector so i can join all thread
+           // std::thread listen (&client.createThread);
+            
         }
     }
 }
