@@ -88,27 +88,34 @@ void server::acceptCall()
     char data[1025] = "hello this is server wait my commands ;)";
     while(this->runServer == true)
     {
+        int clientSocket = 0;
     //remove all messages to gui
     std::cout<<"Waiting connections"<<std::endl;
     //client socket number is unique
     //thread to get commands from server move this also
-    this->clientSocket = accept(this->listening,(sockaddr*)&this->client,&this->clientsize);
+    clientSocket = accept(this->listening,(sockaddr*)&this->client,&this->clientsize);
 
-    if (clientSocket == -1)
-    {
-        std::cout<<"Error with client connection"<<std::endl;
-        server::errorNumber = -4;
-    }
+        if (clientSocket == -1)
+            {
+            std::cout<<"Error with client connection"<<std::endl;
+            server::errorNumber = -4;
+             }
+        else
+            {
+            //register client 
+            // send hello message
 
-    //register client 
-    this->setConnectionId(clientSocket);
-    if (this->connectionsNumber >= 2)
-    {
-        for (int k=0; k<2; k++)
-        {
-            write(connectionId[k],data,strlen(data));
-        }
-    }
+            // get real host name
+            std::string hostname = "hostname";
+            //class for connection
+            //do i need create thread in here and follow that??? *************
+            clientClass newClientConnection(hostname, clientSocket);
+            //std::thread testi(&clientClass clientClass,);
+            //this->clientThread.push_back(testi);
+            this->setConnectionId(clientSocket);
+            //push connection class to client container
+            this->clientContainer.push_back(newClientConnection);
+            }
     }
     //close all sockets
     for (int i =0; i < this->connectionsNumber; i++)
@@ -129,6 +136,9 @@ void server::startServer()
     std::thread t_menu(&server::startMenu,this);
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
+    //start listening incoming clients **this kind thread wont work***
+   // std::thread t_readMessages(&server::readClientMessages,this);
+  //  t_readMessages.join();
     t_listener.join();
     t_menu.join();
     t_alive.join();
@@ -179,57 +189,59 @@ void server::checkAliveClient()
 {
     //waiting other threads
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    int alive, hope = 0;
-    
-    int getAliveConnections[100];
-    char buffer[4000];
-    char testMessage[2] = "0";
-    memset(getAliveConnections,0,sizeof(getAliveConnections));
-    while (this->runServer == true)
-    {
-    for (int i = 0; i < this->connectionsNumber; i++)
-    {
-        //send test message to test is client online
-      send(this->connectionId[i],testMessage, sizeof(testMessage), 0);
-        //wait answer
-      alive = recv(this->connectionId[i],buffer,sizeof(buffer),MSG_DONTWAIT);
-    
-        if (alive > 0)
-        {
-            //connection is alive
-            getAliveConnections[hope] = this->connectionId[i];      
-            hope++;          
-        }
-        //close inactive connection
-        if (alive < 0)
-        {
-            close(connectionId[i]);
-        }
         
-    }
-   // std::cout<<"all alive tested"<<std::endl;
-   
- if (hope != this->connectionsNumber && hope != 0)
+    time_t clientTimestamp;
+    while(this->runServer == true)
     {
-   for (int k=0; k< 100; k++)
-   {
-    this->connectionId[k] = getAliveConnections[k];
-   }
-  // std::cout<<"all connection copied"<<std::endl;
-    //update numbers of active connections
-   
-        //hope--;
-    this->connectionsNumber = hope;
-    }
-    if (hope == 0 && this->connectionsNumber == 1)
-    {
-        this->connectionsNumber = 0;
-    }
-    hope = 0;
-    memset(getAliveConnections,0,sizeof(getAliveConnections));
-   // std::cout<<"active clients: "<<this->connectionsNumber<<std::endl;
+    //check client timestamp
+    time_t timestamp;
+    char message[] = "time out";
+    char* connectionTimeOut = message;
+    time(&timestamp);
+    int position = 0;
+    timestamp -= 20;
+    //connection timeout
 
+        for (auto client : this->clientContainer)
+        {
+            clientTimestamp = client.getTimestamp();
+            std::cout<<"client timestamp: "<<client.getTimestamp()<<" client socketID: "<<client.getSocketId()<<std::endl;
+            if (clientTimestamp <= timestamp )
+            {
+                int socketID = client.getSocketId();
+                //set offline to kill thread inside client
+                client.setOffline();
+                std::cout<<"client Status is: "<<client.getStatus()<<std::endl;
+                //send message to kill thread
+                send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
+                //close socket
+                //wait until thread is killed in client
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                close(client.getSocketId());
+                this->clientContainer.erase(this->clientContainer.begin()+position);
+
+                //delete object and delete from vector this object
+            }
+            position++;
+        }
     //break for 5 seconds before next check
     std::this_thread::sleep_for(std::chrono::seconds(5));
     }
+}
+void server::readClientMessages()
+{
+    std::cout<<"thread what read client messages"<<std::endl;
+    while(this->runServer == true)
+    {
+    for (auto client : this->clientContainer)
+    {
+        if(client.getListening() == 0 ) //&& client.getStatus() == 1
+        {
+            std::cout<<"creating thread in server.cpp to id: "<<client.getSocketId()<<std::endl;
+            //trying create new thread and maybe set that in vector so i can join all thread
+           // std::thread listen (&client.createThread);
+            
+        }
+    }
+}
 }

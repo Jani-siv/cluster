@@ -2,15 +2,37 @@
 #define CLIENTCLASS_H
 #include <iostream>
 #include <thread>
+#include <time.h>
+#include <thread>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <string>
 class clientClass
 {
-    public:
-    void setConnectionId(int id);
-    clientClass();
-    ~clientClass();
     private:
-    int connectionId;
-    int threadId;
+    //connection id
+    int socketId;
+    time_t onlineTimestamp;
+    std::string Hostname;
+    int online;
+    char request[10];
+    int serverListening = 0;
+
+    public:
+    clientClass(std::string hostName, int socketId);
+    ~clientClass();
+    void setTimestamp();
+    void setSocketId(int socketId);
+    void setHostName(std::string hostname);
+    time_t getTimestamp();
+    int getSocketId();
+    void setOffline();
+    void listenClientMessages();
+    void createThread();
+    void setListening();
+    int getListening();
+    int getStatus();
+    void setOnline();
 };
 
 
