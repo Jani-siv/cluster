@@ -86,6 +86,7 @@ void server::acceptCall()
     //left here only listening part and move all others in own thread
     //message to connecting client
     char data[1025] = "hello this is server wait my commands ;)";
+   
     while(this->runServer == true)
     {
         int clientSocket = 0;
@@ -105,8 +106,12 @@ void server::acceptCall()
             //register client 
             // send hello message
 
-            // get real host name
-            std::string hostname = "hostname";
+            // get client ip addr
+            getpeername(clientSocket,(sockaddr*)&this->client,&this->clientsize);
+            
+            char *hostname = inet_ntoa(this->client.sin_addr);
+            std::cout<<"New connection from: "<<hostname<<std::endl;
+            
             //class for connection
             //do i need create thread in here and follow that??? *************
             clientClass newClientConnection(hostname, clientSocket);
