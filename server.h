@@ -35,6 +35,7 @@ int errorNumber = 0;
 bool runServer = true;
 int clientId = 0;
 //mitä serverin täytyy säilyttää
+
 //socket address struct hint
 sockaddr_in hint;
 //client object

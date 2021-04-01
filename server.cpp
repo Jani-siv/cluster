@@ -119,6 +119,7 @@ void server::acceptCall()
             this->setConnectionId(clientSocket);
             //push connection class to client container
             this->clientContainer.push_back(newClientConnection);
+           
             }
     }
     //close all sockets
@@ -141,8 +142,8 @@ void server::startServer()
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
     //start listening incoming clients **this kind thread wont work***
-   // std::thread t_readMessages(&server::readClientMessages,this);
-  //  t_readMessages.join();
+    std::thread t_readMessages(&server::readClientMessages,this);
+    t_readMessages.join();
     t_listener.join();
     t_menu.join();
     t_alive.join();
@@ -234,18 +235,36 @@ void server::checkAliveClient()
 }
 void server::readClientMessages()
 {
+    
     std::cout<<"thread what read client messages"<<std::endl;
+    char message[4000];
+    char* pmessage = message;
     while(this->runServer == true)
     {
-    for (auto client : this->clientContainer)
-    {
-        if(client.getListening() == 0 ) //&& client.getStatus() == 1
+        if (this->connectionsNumber > 0)
         {
-            std::cout<<"creating thread in server.cpp to id: "<<client.getSocketId()<<std::endl;
-            //trying create new thread and maybe set that in vector so i can join all thread
-           // std::thread listen (&client.createThread);
+
+        
+            for (auto client : this->clientContainer)
+            {
+               //std::cout<<"reading messages"<<std::endl;
+                if(client.getListening() == 0 ) 
+                {
+                    int socketAddress = client.getSocketId();
+                    read(socketAddress,pmessage, sizeof(message));
+
+                     std::cout<<"message from client: "<<message<<std::endl;
+
+                }
+                
+                  //  {
+                //        std::cout<<"maybe best place to select"<<std::endl;
+                        //trying create new thread and maybe set that in vector so i can join all thread
+                        // std::thread listen (&client.createThread);
             
+                    //}
+            }
         }
+       
     }
-}
 }
