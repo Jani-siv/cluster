@@ -13,17 +13,17 @@ class clientClass
     //connection id
     int socketId;
     time_t onlineTimestamp;
-    std::string Hostname;
+    char* Hostname;
     int online;
     char request[10];
     int serverListening = 0;
 
     public:
-    clientClass(std::string hostName, int socketId);
+    clientClass(char* hostName, int socketId);
     ~clientClass();
     void setTimestamp();
     void setSocketId(int socketId);
-    void setHostName(std::string hostname);
+    void setHostName(char* hostname);
     time_t getTimestamp();
     int getSocketId();
     void setOffline();

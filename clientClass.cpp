@@ -1,5 +1,5 @@
 #include "clientClass.h"
-clientClass::clientClass(std::string hostName, int socketId)
+clientClass::clientClass(char* hostName, int socketId)
 {
     this->setTimestamp();
     this->setOnline();
@@ -26,7 +26,7 @@ void clientClass::setSocketId(int socketId)
 {
  this->socketId = socketId;
 }
-void clientClass::setHostName(std::string hostname)
+void clientClass::setHostName(char* hostname)
 {
  this->Hostname = hostname;
 }
