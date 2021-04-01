@@ -108,15 +108,14 @@ void server::acceptCall()
 
             // get client ip addr
             getpeername(clientSocket,(sockaddr*)&this->client,&this->clientsize);
-            
+            //shout out hostname
             char *hostname = inet_ntoa(this->client.sin_addr);
             std::cout<<"New connection from: "<<hostname<<std::endl;
             
             //class for connection
-            //do i need create thread in here and follow that??? *************
             clientClass newClientConnection(hostname, clientSocket);
-            //std::thread testi(&clientClass clientClass,);
-            //this->clientThread.push_back(testi);
+            //for listening sockets https://gist.github.com/Alexey-N-Chernyshov/4634731
+
             this->setConnectionId(clientSocket);
             //push connection class to client container
             this->clientContainer.push_back(newClientConnection);
