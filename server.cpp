@@ -128,6 +128,8 @@ void server::acceptCall()
 
 void server::startServer()
 {
+    if(this->errorNumber >= 0)
+    {
     //incoming connections thread
     std::thread t_listener(&server::acceptCall, this);
     //menu thread
@@ -141,6 +143,9 @@ void server::startServer()
     t_menu.join();
     t_alive.join();
     std::cout<<"server is down"<<std::endl;
+    }
+    else
+    std::cout<<"Error to start server code: "<<this->errorNumber<<std::endl;
 }
 
 void server::startMenu()
