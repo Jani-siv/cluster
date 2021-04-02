@@ -232,8 +232,10 @@ void server::readClientMessages()
 {
     
     std::cout<<"thread what read client messages"<<std::endl;
-    char message[4000];
+    char message[100];
     char* pmessage = message;
+    char answer[100] = "welcome";
+    char* panswer = answer;
     while(this->runServer == true)
     {
         if (this->connectionsNumber >= 0)
@@ -252,28 +254,18 @@ void server::readClientMessages()
                         read(this->clientContainer.at(i).getSocketId(),pmessage,sizeof(message));
                         this->clientContainer.at(i).setTimestamp();
                         // do something with message
-                        std::cout<<message<<std::endl;
+                        std::cout<<message[0]<<std::endl;
+                        if (message[0] == 'C')
+                        {
+                            std::cout<<"Sending message!!!"<<std::endl;
+                            send(this->clientContainer.at(i).getSocketId(),panswer,sizeof(answer),0);
+                        }
+                        memset(message,0,sizeof(message));
                     }
                 }
             }
-        
-            //for (auto client : this->clientContainer)
-           // {
-               //std::cout<<"reading messages"<<std::endl;
-             //   if(client.getListening() == 0 ) 
-               // {
-                 //   int socketAddress = client.getSocketId();
-                    
-
-                //}
-                
-                  //  {
-                //        std::cout<<"maybe best place to select"<<std::endl;
-                        //trying create new thread and maybe set that in vector so i can join all thread
-                        // std::thread listen (&client.createThread);
-            
-                    //}
-            }
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+     }
        
-    }
+}
