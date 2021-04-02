@@ -82,11 +82,6 @@ void server::markSocketToListening()
 
 void server::acceptCall()
 {
-
-    //left here only listening part and move all others in own thread
-    //message to connecting client
-    char data[1025] = "hello this is server wait my commands ;)";
-   
     while(this->runServer == true)
     {
         int clientSocket = 0;
@@ -103,18 +98,16 @@ void server::acceptCall()
              }
         else
             {
-            //register client 
-            // send hello message
-
             // get client ip addr
             getpeername(clientSocket,(sockaddr*)&this->client,&this->clientsize);
             //shout out hostname
             char *hostname = inet_ntoa(this->client.sin_addr);
             std::cout<<"New connection from: "<<hostname<<std::endl;
             
-            //class for connection
+            //class for connection hostname and socket
             clientClass newClientConnection(hostname, clientSocket);
-            //for listening sockets https://gist.github.com/Alexey-N-Chernyshov/4634731
+            //set client socket in poll
+            this->fds[this->connectionsNumber].fd = clientSocket;
 
             this->setConnectionId(clientSocket);
             //push connection class to client container
@@ -221,9 +214,11 @@ void server::checkAliveClient()
                 send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
                 //close socket
                 //wait until thread is killed in client
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                //std::this_thread::sleep_for(std::chrono::seconds(2));
+                this->connectionsNumber--;
                 close(client.getSocketId());
                 this->clientContainer.erase(this->clientContainer.begin()+position);
+                
 
                 //delete object and delete from vector this object
             }
@@ -241,21 +236,36 @@ void server::readClientMessages()
     char* pmessage = message;
     while(this->runServer == true)
     {
-        if (this->connectionsNumber > 0)
+        if (this->connectionsNumber >= 0)
         {
-
-        
-            for (auto client : this->clientContainer)
+            for(int i =0; i < this->connectionsNumber+1; i++)
             {
-               //std::cout<<"reading messages"<<std::endl;
-                if(client.getListening() == 0 ) 
+                this->fds[i].events = POLLIN;
+            }
+            this->ret = poll(this->fds,this->connectionsNumber+1,this->timeout_msecs);
+            if (this->ret > 0)
+            {
+                for (int i = 0; i < this->connectionsNumber+1; i++)
                 {
-                    int socketAddress = client.getSocketId();
-                    read(socketAddress,pmessage, sizeof(message));
-
-                     std::cout<<"message from client: "<<message<<std::endl;
-
+                    if(this->fds[i].revents & POLLIN)
+                    {
+                        read(this->clientContainer.at(i).getSocketId(),pmessage,sizeof(message));
+                        this->clientContainer.at(i).setTimestamp();
+                        // do something with message
+                        std::cout<<message<<std::endl;
+                    }
                 }
+            }
+        
+            //for (auto client : this->clientContainer)
+           // {
+               //std::cout<<"reading messages"<<std::endl;
+             //   if(client.getListening() == 0 ) 
+               // {
+                 //   int socketAddress = client.getSocketId();
+                    
+
+                //}
                 
                   //  {
                 //        std::cout<<"maybe best place to select"<<std::endl;
@@ -267,4 +277,3 @@ void server::readClientMessages()
         }
        
     }
-}

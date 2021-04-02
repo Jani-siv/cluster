@@ -19,6 +19,7 @@
 #include "menu.h"
 #include <vector>
 #include "time.h"
+#include <poll.h>
 
 class server
 {
@@ -41,7 +42,7 @@ sockaddr_in hint;
 //client object
 int connectionId[100];
 int aliveConnection[100];
-int connectionsNumber =0;
+int connectionsNumber =0; //numbers of fds
 int command = 0;
 //socket
 int listening;
@@ -49,8 +50,11 @@ int listening;
 std::string address = "0.0.0.0";
 //client socket 
  int clientSocket;
- //client address
-    /* data */
+//poll
+struct pollfd fds[1024];
+int timeout_msecs = 500;
+int ret;
+
 public:
     server(/* args */);
     ~server();
