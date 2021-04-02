@@ -82,11 +82,6 @@ void server::markSocketToListening()
 
 void server::acceptCall()
 {
-
-    //left here only listening part and move all others in own thread
-    //message to connecting client
-    char data[1025] = "hello this is server wait my commands ;)";
-   
     while(this->runServer == true)
     {
         int clientSocket = 0;
@@ -103,23 +98,21 @@ void server::acceptCall()
              }
         else
             {
-            //register client 
-            // send hello message
-
             // get client ip addr
             getpeername(clientSocket,(sockaddr*)&this->client,&this->clientsize);
-            
+            //shout out hostname
             char *hostname = inet_ntoa(this->client.sin_addr);
             std::cout<<"New connection from: "<<hostname<<std::endl;
             
-            //class for connection
-            //do i need create thread in here and follow that??? *************
+            //class for connection hostname and socket
             clientClass newClientConnection(hostname, clientSocket);
-            //std::thread testi(&clientClass clientClass,);
-            //this->clientThread.push_back(testi);
+            //set client socket in poll
+            this->fds[this->connectionsNumber].fd = clientSocket;
+
             this->setConnectionId(clientSocket);
             //push connection class to client container
             this->clientContainer.push_back(newClientConnection);
+           
             }
     }
     //close all sockets
@@ -142,8 +135,8 @@ void server::startServer()
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
     //start listening incoming clients **this kind thread wont work***
-   // std::thread t_readMessages(&server::readClientMessages,this);
-  //  t_readMessages.join();
+    std::thread t_readMessages(&server::readClientMessages,this);
+    t_readMessages.join();
     t_listener.join();
     t_menu.join();
     t_alive.join();
@@ -221,9 +214,11 @@ void server::checkAliveClient()
                 send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
                 //close socket
                 //wait until thread is killed in client
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                //std::this_thread::sleep_for(std::chrono::seconds(2));
+                this->connectionsNumber--;
                 close(client.getSocketId());
                 this->clientContainer.erase(this->clientContainer.begin()+position);
+                
 
                 //delete object and delete from vector this object
             }
@@ -235,18 +230,42 @@ void server::checkAliveClient()
 }
 void server::readClientMessages()
 {
+    
     std::cout<<"thread what read client messages"<<std::endl;
+    char message[100];
+    char* pmessage = message;
+    char answer[100] = "welcome";
+    char* panswer = answer;
     while(this->runServer == true)
     {
-    for (auto client : this->clientContainer)
-    {
-        if(client.getListening() == 0 ) //&& client.getStatus() == 1
+        if (this->connectionsNumber >= 0)
         {
-            std::cout<<"creating thread in server.cpp to id: "<<client.getSocketId()<<std::endl;
-            //trying create new thread and maybe set that in vector so i can join all thread
-           // std::thread listen (&client.createThread);
-            
+            for(int i =0; i < this->connectionsNumber+1; i++)
+            {
+                this->fds[i].events = POLLIN;
+            }
+            this->ret = poll(this->fds,this->connectionsNumber+1,this->timeout_msecs);
+            if (this->ret > 0)
+            {
+                for (int i = 0; i < this->connectionsNumber+1; i++)
+                {
+                    if(this->fds[i].revents & POLLIN)
+                    {
+                        read(this->clientContainer.at(i).getSocketId(),pmessage,sizeof(message));
+                        this->clientContainer.at(i).setTimestamp();
+                        // do something with message
+                        std::cout<<message[0]<<std::endl;
+                        if (message[0] == 'C')
+                        {
+                            std::cout<<"Sending message!!!"<<std::endl;
+                            send(this->clientContainer.at(i).getSocketId(),panswer,sizeof(answer),0);
+                        }
+                        memset(message,0,sizeof(message));
+                    }
+                }
+            }
         }
-    }
-}
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+     }
+       
 }
