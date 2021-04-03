@@ -241,6 +241,8 @@ void server::readClientMessages()
     char* pmessage = message;
     char answer[100] = "welcome";
     char* panswer = answer;
+    char quit[100] = "Q";
+    char* pquit = quit;
     while(this->runServer == true)
     {
         if (this->connectionsNumber >= 0)
@@ -264,6 +266,19 @@ void server::readClientMessages()
                         {
                             std::cout<<"Sending message!!!"<<std::endl;
                             send(this->clientContainer.at(i).getSocketId(),panswer,sizeof(answer),0);
+                        }
+                        if (message[0] == 'Q')
+                        {
+                            std::cout<<"Sending message!!!"<<std::endl;
+                            send(this->clientContainer.at(i).getSocketId(),pquit,sizeof(quit),0);
+                            //close client port
+                            close(this->clientContainer.at(i).getSocketId());
+                            // - client count
+                            this->connectionsNumber--;
+                            //remove object
+                            this->clientContainer.at(i).~clientClass();
+                            //remove client from container
+                            this->clientContainer.erase(this->clientContainer.begin()+i);
                         }
                         memset(message,0,sizeof(message));
                     }
