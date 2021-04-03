@@ -9,6 +9,6 @@ engine: $(OBJS)
 main.cpp:server.h
 server.cpp::server.h clientClass.h menu.h
 clientClass.cpp:: clientClass.h
-menu.cpp:: menu.h
+menu.cpp:: menu.h clientClass.h
 clean:
 		$(RM) game $(OBJS)

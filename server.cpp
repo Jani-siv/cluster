@@ -163,7 +163,10 @@ while (this->runServer == true)
 void server::executeCommand()
 {
     //show active nodes
-    if (this->command == 1) {this->runServer = false;}
+    if (this->command == 1) 
+    {
+        this->serverMenu->showActiveClients(this->clientContainer, this->connectionsNumber);
+    }
     //send command to nodes
     if (this->command == 2) {this->runServer = false;}
     //update nodes

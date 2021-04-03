@@ -78,3 +78,7 @@ int clientClass::getStatus()
 {
     return this->online;
 }
+char * clientClass::getHostname()
+{
+    return this->Hostname;
+}
