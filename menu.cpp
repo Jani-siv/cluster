@@ -20,23 +20,16 @@ int menu::showMenu()
     return command;
 }
 
-void menu::showActiveClients(std::vector<clientClass>clients, int connections)
+int menu::showActiveClients(int connections)
 {
     if (connections <= 0)
     {
         std::cout<<"No active clients"<<std::endl;
+        return 0;
     }
     if (connections > 0)
     {
-    std::cout<<"***Active clients***"<<std::endl;
-    for (auto active : clients)
-    {
-        //time_t lastactivity = active.getTimestamp();
-        //time_t now;
-        //time(&now);
-        //now = now - lastactivity;
-        std::cout<<"address: "<<active.getHostname()<<" Socket: "<<active.getSocketId()<<" Last activity: "
-        <<" seconds ago"<<std::endl;
+        return 1;
     }
-    }
+    return 0;
 }
