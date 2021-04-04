@@ -20,6 +20,7 @@
 #include <vector>
 #include "time.h"
 #include <poll.h>
+#include <mutex>
 
 class server
 {
@@ -58,6 +59,8 @@ int ret;
 public:
     server(/* args */);
     ~server();
+    //mutex
+    std::mutex vectorLock;
     //error handling
     int checkError();
     //create socket
@@ -80,6 +83,7 @@ public:
     void checkAliveClient();
     void createClientThread();
     void readClientMessages();
+    
 };
 
 
