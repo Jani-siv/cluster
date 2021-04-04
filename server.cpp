@@ -24,13 +24,11 @@ int server::checkError()
     else 
         return 0;
 }
-
-void server::setConnectionId(int clientSocket)
+void server::addConnectionNumber()
 {
-    this->connectionId[this->connectionsNumber] = clientSocket;
     this->connectionsNumber++;
-    std::cout<<"New connection added: "<<clientSocket<<std::endl;
 }
+
 void server::createSocket()
 {
     if (this->checkError() == 0)
@@ -100,19 +98,13 @@ void server::acceptCall()
             {
             // get client ip addr
             getpeername(clientSocket,(sockaddr*)&this->client,&this->clientsize);
-            //shout out hostname
             char *hostname = inet_ntoa(this->client.sin_addr);
-            std::cout<<"New connection from: "<<hostname<<std::endl;
-            
-            //class for connection hostname and socket
-            clientClass newClientConnection(hostname, clientSocket);
             //set client socket in poll
             this->fds[this->connectionsNumber].fd = clientSocket;
-
-            this->setConnectionId(clientSocket);
+            //add one to total connections
+            this->addConnectionNumber();
             //push connection class to client container
-            this->clientContainer.push_back(newClientConnection);
-           
+            this->connectionsNumber = this->addClient(hostname, clientSocket, this->connectionsNumber);   
             }
     }
     //close all sockets
@@ -120,7 +112,6 @@ void server::acceptCall()
     {
         close(this->connectionId[i]);
         std::cout<<"connection id: "<<this->connectionId[i]<<" is closed"<<std::endl;
-
     }
     
 }
@@ -167,7 +158,12 @@ void server::executeCommand()
     //show active nodes
     if (this->command == 1) 
     {
-        this->serverMenu->showActiveClients(this->clientContainer, this->connectionsNumber);
+        
+        int connections = this->serverMenu->showActiveClients(this->connectionsNumber);
+        if (connections == 1)
+            {
+                this->showActiveClients();
+            }
     }
     //send command to nodes
     if (this->command == 2) {this->runServer = false;}
@@ -197,45 +193,17 @@ void server::checkAliveClient()
 {
     //waiting other threads
     std::this_thread::sleep_for(std::chrono::seconds(2));
-        
-    time_t clientTimestamp;
     while(this->runServer == true)
     {
-    //check client timestamp
-    time_t timestamp;
-    char message[] = "time out";
-    char* connectionTimeOut = message;
-    time(&timestamp);
-    int position = 0;
-    timestamp -= 20;
-    //connection timeout
-
-        for (auto client : this->clientContainer)
+        //check if client is offline
+        int remove = this->checkClientTimeOut(this->connectionsNumber);
+        if (remove >= this->connectionsNumber)
         {
-            clientTimestamp = client.getTimestamp();
-            std::cout<<"client timestamp: "<<client.getTimestamp()<<" client socketID: "<<client.getSocketId()<<std::endl;
-            if (clientTimestamp <= timestamp )
-            {
-                int socketID = client.getSocketId();
-                //set offline to kill thread inside client
-                client.setOffline();
-                std::cout<<"client Status is: "<<client.getStatus()<<std::endl;
-                //send message to kill thread
-                send(socketID,connectionTimeOut,sizeof(connectionTimeOut),0);
-                //close socket
-                //wait until thread is killed in client
-                //std::this_thread::sleep_for(std::chrono::seconds(2));
-                this->connectionsNumber--;
-                close(client.getSocketId());
-                this->clientContainer.erase(this->clientContainer.begin()+position);
-                
-
-                //delete object and delete from vector this object
-            }
-            position++;
+            this->connectionsNumber =this->removeClient(remove, this->connectionsNumber);
         }
-    //break for 5 seconds before next check
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+        
+        //break for 5 seconds before next check
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 void server::readClientMessages()
@@ -263,34 +231,30 @@ void server::readClientMessages()
                 {
                     if(this->fds[i].revents & POLLIN)
                     {
-                        read(this->clientContainer.at(i).getSocketId(),pmessage,sizeof(message));
-                        this->clientContainer.at(i).setTimestamp();
+                        read(this->getClientSocket(i),pmessage,sizeof(message));
+                        this->setTimeStamp(i);
                         // do something with message
                         std::cout<<message[0]<<std::endl;
                         if (message[0] == 'C')
                         {
                             std::cout<<"Sending message!!!"<<std::endl;
-                            send(this->clientContainer.at(i).getSocketId(),panswer,sizeof(answer),0);
+                            send(this->getClientSocket(i),panswer,sizeof(answer),0);
                         }
                         if (message[0] == 'Q')
                         {
                             std::cout<<"Sending message!!!"<<std::endl;
-                            send(this->clientContainer.at(i).getSocketId(),pquit,sizeof(quit),0);
+                            send(this->getClientSocket(i),pquit,sizeof(quit),0);
                             //close client port
-                            close(this->clientContainer.at(i).getSocketId());
-                            // - client count
-                            this->connectionsNumber--;
-                            //remove object
-                            this->clientContainer.at(i).~clientClass();
-                            //remove client from container
-                            this->clientContainer.erase(this->clientContainer.begin()+i);
+                            close(this->getClientSocket(i));
+                            // remove client and set new amount of connections
+                            this->connectionsNumber = this->removeClient(i,this->connectionsNumber);
                         }
                         memset(message,0,sizeof(message));
                     }
                 }
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
      }
        
 }

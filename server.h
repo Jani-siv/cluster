@@ -21,8 +21,9 @@
 #include "time.h"
 #include <poll.h>
 #include <mutex>
+#include "clientContainer.h"
 
-class server
+class server : public clientContainer
 {
     public:
     sockaddr_in client;
@@ -59,8 +60,8 @@ int ret;
 public:
     server(/* args */);
     ~server();
-    //mutex
-    std::mutex vectorLock;
+    //add one to total connection number
+    void addConnectionNumber();
     //error handling
     int checkError();
     //create socket
@@ -76,7 +77,6 @@ public:
     //close socket
     void startServer();
     void startMenu();
-    void setConnectionId(int clientSocket);
   //  void menu();
     void executeCommand();
     void killConnection();

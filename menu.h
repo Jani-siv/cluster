@@ -12,7 +12,7 @@ public:
     menu(/* args */);
     ~menu();
     int showMenu();
-    void showActiveClients(std::vector<clientClass>clients, int connections);
+    int showActiveClients(int connections);
 };
 
 
