@@ -26,12 +26,7 @@ int clientContainer::removeClient(int position, int connections)
 {
     if (connections != 0)
     {
-    std::cout<<"position to remove: "<<position<<" amount of vectors: "<<this->clients.size()<<std::endl;
-    if (position == this->clients.size())
-    {
-        
-        position --;
-    }
+ 
     std::cout<<"lock for remove client"<<std::endl;
     this->mylock.lock();
     std::cout<<"continue"<<std::endl;
@@ -42,7 +37,6 @@ int clientContainer::removeClient(int position, int connections)
     this->clients.at(position).~clientClass();
     std::cout<<"remove client class"<<std::endl;
     this->clients.erase(this->clients.begin()+position);
-    std::cout<<"lock for remove vector"<<std::endl;
     this->mylock.unlock();
     std::cout<<"unlock for remove client"<<std::endl;
     connections--;
@@ -53,15 +47,16 @@ int clientContainer::removeClient(int position, int connections)
 void clientContainer::showActiveClients()
 {
     std::cout<<"lock for show active clients"<<std::endl;
-    this->mylock.lock();
-        for (auto active : clients)
+    
+
+        for (int i = 0; i < this->clients.size(); i++)
     {
-        time_t lastactivity = active.getTimestamp();
+        time_t lastactivity = this->clients.at(i).getTimestamp();
         time_t now;
         time(&now);
         now = now - lastactivity;
-        std::cout<<"address: "<<active.getHostname()<<" Socket: "<<active.getSocketId()<<" Last activity: "
-        <<" seconds ago"<<std::endl;
+        std::cout<<"address: "<<this->clients.at(i).getHostname()<<" Socket: "<<this->clients.at(i).getSocketId()<<" Last activity: "
+        <<now<<" seconds ago"<<std::endl;
     }
     this->mylock.unlock();
     std::cout<<"unlock for show active clients"<<std::endl;
@@ -74,7 +69,7 @@ int clientContainer::checkClientTimeOut(int connectionsNumber)
     time_t timestamp;
     time(&timestamp);
     int position = 0;
-    int remove = 0;
+    int remove = -1;
     std::cout<<"lock for check timeout"<<std::endl;
     this->mylock.lock();
     std::cout<<"lock for check timeout"<<std::endl;
@@ -84,21 +79,25 @@ int clientContainer::checkClientTimeOut(int connectionsNumber)
         {
             long clientTimestamp = this->clients.at(i).getTimestamp();
             std::cout<<"client timestamp: "<<this->clients.at(i).getTimestamp()<<" client socketID: "<<this->clients.at(i).getSocketId()<<std::endl;
-            if (clientTimestamp <= timestamp-this->timeout )
+            clientTimestamp += this->timeout;
+            std::cout<<"diffrence in timestamps: "<<clientTimestamp-timestamp<<std::endl;
+            if (clientTimestamp <= timestamp )
             {
+                std::cout<<"int i: "<<i<<std::endl;
                // connectionsNumber = this->removeClient(position, connectionsNumber);
                 int socketID = this->clients.at(i).getSocketId();
                 connectionsNumber--;
                 close(socketID);
                 //this->clients.erase(this->clients.begin()+position);
-                remove = position;
+                this->mylock.unlock();
+                return i;
             }
             position++;
         }
         this->clients.rbegin();
     this->mylock.unlock();
     std::cout<<"unlock for check timeout"<<std::endl;
-    return position;
+    return remove;
     }
 return -1;
 }

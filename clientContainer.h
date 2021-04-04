@@ -10,7 +10,7 @@ class clientContainer
 {
 private:
     /* data */
-    const int timeout = 20;
+    const long timeout = 20;
 protected:
     std::vector<clientClass> clients;
     std::mutex mylock;

@@ -125,8 +125,6 @@ void server::startServer()
     std::thread t_listener(&server::acceptCall, this);
     //menu thread
     std::thread t_menu(&server::startMenu,this);
-    //init client container
-    this->killConnection();
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
     //start listening incoming clients **this kind thread wont work***
@@ -160,7 +158,7 @@ void server::executeCommand()
     {
         
         int connections = this->serverMenu->showActiveClients(this->connectionsNumber);
-        if (connections == 1)
+        if (connections == 1 && this->connectionsNumber > 0)
             {
                 this->showActiveClients();
             }
@@ -195,15 +193,20 @@ void server::checkAliveClient()
     std::this_thread::sleep_for(std::chrono::seconds(2));
     while(this->runServer == true)
     {
+        if (this->connectionsNumber > 0)
+        {
         //check if client is offline
         int remove = this->checkClientTimeOut(this->connectionsNumber);
-        if (remove >= this->connectionsNumber)
+        if (remove >= 0)
         {
             this->connectionsNumber =this->removeClient(remove, this->connectionsNumber);
         }
         
         //break for 5 seconds before next check
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(499));
+        }
+        else
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 void server::readClientMessages()
@@ -218,7 +221,7 @@ void server::readClientMessages()
     char* pquit = quit;
     while(this->runServer == true)
     {
-        if (this->connectionsNumber >= 0)
+        if (this->connectionsNumber > 0)
         {
             for(int i =0; i < this->connectionsNumber+1; i++)
             {
