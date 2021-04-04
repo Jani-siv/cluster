@@ -134,6 +134,8 @@ void server::startServer()
     std::thread t_listener(&server::acceptCall, this);
     //menu thread
     std::thread t_menu(&server::startMenu,this);
+    //init client container
+    this->killConnection();
     //check alive clients thread
     std::thread t_alive(&server::checkAliveClient,this);
     //start listening incoming clients **this kind thread wont work***
