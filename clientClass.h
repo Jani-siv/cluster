@@ -33,6 +33,7 @@ class clientClass
     int getListening();
     int getStatus();
     void setOnline();
+    char* getHostname();
 };
 
 
