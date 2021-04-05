@@ -164,7 +164,10 @@ void server::executeCommand()
             }
     }
     //send command to nodes
-    if (this->command == 2) {this->runServer = false;}
+    if (this->command == 2) 
+    {
+        this->serverMenu->runNeural();
+    }
     //update nodes
     if (this->command == 3) {this->runServer = false;}
     //kill server
