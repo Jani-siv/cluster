@@ -42,6 +42,7 @@ int clientContainer::removeClient(int position, int connections)
     connections--;
     return connections;
     }
+    return -100;
 }
 
 void clientContainer::showActiveClients()

@@ -11,7 +11,7 @@ neural::~neural()
 void neural::calculateOutput()
 {
     auto start = std::chrono::high_resolution_clock::now();
-    double temp;
+    
     this->setInput();
     for(int k = 0; k < this->inputClass.size(); k++)
     {
@@ -34,6 +34,9 @@ void neural::calculateOutput()
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout<<duration.count()<<"microseconds"<<std::endl;
     }
+    //remove this test
+    layer testi(5,3,this->inputClass[0]);
+    testi.testCout();
 }
 
 //creating new class and push it in vector

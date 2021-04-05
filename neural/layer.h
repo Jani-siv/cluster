@@ -3,7 +3,8 @@
 #include <vector>
 #include "input.h"
 #include <random>
-#include <time.h>
+#include <chrono>
+#include <iostream>
 
 class layer
 {
@@ -17,6 +18,7 @@ public:
     layer(int weights, int neurons,input* inputdata);
     ~layer();
     double randomDouble();
+    void testCout();
 };
 
 
