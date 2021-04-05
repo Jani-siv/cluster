@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include "input.h"
+#include "layer.h"
 //template <typename T>
 
 class neural
@@ -11,6 +12,7 @@ class neural
 private:
     /* data */
     std::vector<input*> inputClass;
+    std::vector<layer*> layerClass;
     int inputs = 0;
     //std::vector<double> inputs {1,2,3,2.5};
     std::vector<std::vector<double>> weights {{0.2,0.8,-0.5,1.0},
