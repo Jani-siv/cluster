@@ -4,7 +4,7 @@
 #include "clientClass.h"
 #include <vector>
 #include <time.h>
-#include "neural.h"
+#include "neural/neural.h"
 class menu
 {
 private:
