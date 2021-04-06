@@ -25,6 +25,7 @@ public:
     ~neural();
     void calculateOutput();
     void setInput();
+    double getOutput(int i);
 };
 
 #endif

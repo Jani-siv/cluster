@@ -1,8 +1,8 @@
 #include "layer.h"
 
-layer::layer(int weights, int neurons, input* inputData)
+layer::layer(int weights, int neurons)
 {
-this->data = &inputData;
+
 srand(time(0));
 //initialize weights with random number and set bias to all 0
 for (int i = 0; i < neurons; i++)
@@ -49,6 +49,14 @@ void layer::testCout()
         std::cout<<"["<<this->weight[i][k]<<"] ";
     }
     std::cout<<std::endl;
+    }
+}
+double layer::getWeights(int row, int columns)
+{
+    return this->weight[row][columns];
 }
 
+double layer::getBias(int i)
+{
+    return this->bias[i];
 }
