@@ -4,6 +4,7 @@
 #include "clientClass.h"
 #include <vector>
 #include <time.h>
+#include "neural/neural.h"
 class menu
 {
 private:
@@ -13,6 +14,7 @@ public:
     ~menu();
     int showMenu();
     int showActiveClients(int connections);
+    void runNeural();
 };
 
 
