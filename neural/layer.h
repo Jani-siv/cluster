@@ -21,6 +21,8 @@ public:
     void testCout();
     double getWeights(int row, int columns);
     double getBias(int i);
+    int getSizeRows();
+    int getSizeColumns(int i);
     
 
 };

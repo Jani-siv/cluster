@@ -37,5 +37,5 @@ int menu::showActiveClients(int connections)
 void menu::runNeural()
 {
     neural object;
-    object.calculateOutput();
+    object.runProgram();
 }

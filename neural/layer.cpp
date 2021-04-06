@@ -60,3 +60,14 @@ double layer::getBias(int i)
 {
     return this->bias[i];
 }
+
+int layer::getSizeRows()
+{
+    //size on rows
+    return weight.size();
+}
+
+int layer::getSizeColumns(int i)
+{
+return weight[i].size();
+}
