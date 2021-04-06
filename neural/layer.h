@@ -1,7 +1,6 @@
 #ifndef LAYER_H
 #define LAYER_H
 #include <vector>
-#include "input.h"
 #include <random>
 #include <chrono>
 #include <iostream>
@@ -13,13 +12,18 @@ private:
     std::vector<std::vector<double>> weight;
     std::vector<double> bias;
     //pointer to input data
-    input** data;
+    
+    
 public:
-    layer(int weights, int neurons,input* inputdata);
+    layer(int weights, int neurons);
     ~layer();
     double randomDouble();
     void testCout();
+    double getWeights(int row, int columns);
+    double getBias(int i);
+    int getSizeRows();
+    int getSizeColumns(int i);
+    
+
 };
-
-
 #endif
