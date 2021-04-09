@@ -5,9 +5,11 @@
 #include <chrono>
 #include "input.h"
 #include "layer.h"
+#include "filehandle.h"
+#include <iomanip>
 //template <typename T>
 
-class neural
+class neural:public filehandle
 {
 private:
     /* data */
@@ -15,6 +17,7 @@ private:
     std::vector<layer> layerClass;
     std::vector<std::vector<double>> layerOutput;
     std::vector<std::vector<input*>> layerInput;
+    std::vector<std::vector<double>> trainingAnswers;
     int inputs = 0;
     //std::vector<double> inputs {1,2,3,2.5};
    // std::vector<std::vector<double>> weights {{0.2,0.8,-0.5,1.0},
@@ -32,6 +35,10 @@ public:
     double getOutput(int i);
     void setOutputToInput();
     void runProgram();
+    void errorCorrection();
+    void setAnswers();
+    void openFile();
+    void saveCurrentToFile();
 };
 
 #endif

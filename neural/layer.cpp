@@ -11,12 +11,12 @@ for (int i = 0; i < neurons; i++)
 }
 for (int i=0; i< neurons; i++)
 {
-    std::vector<double> temp;
+    std::vector<long double> temp;
     this->weight.push_back(temp);
 
     for (int k=0; k < weights; k++)
     {
-        double tempDouble = this->randomDouble();
+        long double tempDouble = this->randomDouble();
         this->weight[i].push_back(tempDouble);
     }
 }
@@ -28,14 +28,14 @@ layer::~layer()
 {
 }
 
-double layer::randomDouble()
+long double layer::randomDouble()
 {
     unsigned int seed = std::chrono::steady_clock::now().time_since_epoch().count();
    double lower_bound = -1;
    double upper_bound = 1;
    std::uniform_real_distribution<double> unif(lower_bound,upper_bound);
    std::default_random_engine re(seed);
-   double a_random_double = unif(re);
+   long double a_random_double = unif(re);
    return a_random_double;
 }
 
@@ -51,12 +51,12 @@ void layer::testCout()
     std::cout<<std::endl;
     }
 }
-double layer::getWeights(int row, int columns)
+long double layer::getWeights(int row, int columns)
 {
     return this->weight[row][columns];
 }
 
-double layer::getBias(int i)
+long double layer::getBias(int i)
 {
     return this->bias[i];
 }

@@ -8,7 +8,7 @@ input::~input()
 {
 }
 
-void input::setData(double data)
+void input::setData(long double data)
 {
     this->inputData.push_back(data);
 }
@@ -18,7 +18,7 @@ size_t input::getSize()
     return this->inputData.size();
 }
 
-double input::getData(int cell)
+long double input::getData(int cell)
 {
     return this->inputData[cell];
 }
