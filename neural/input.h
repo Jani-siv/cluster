@@ -5,13 +5,13 @@ class input
 {
 private:
     /* data */
-    std::vector<double> inputData;
+    std::vector<long double> inputData;
 public:
     input(/* args */);
     ~input();
-    void setData(double data);
+    void setData(long double data);
     size_t getSize();
-    double getData(int cell);
+    long double getData(int cell);
 };
 
 

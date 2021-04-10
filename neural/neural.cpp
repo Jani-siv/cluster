@@ -10,7 +10,7 @@ neural::~neural()
 //from file
 void neural::calculateOutput()
 {
-
+    
     for(int k = 0; k < this->inputClass.size(); k++)
     {
     // one for loop more for multiple inputs
@@ -21,6 +21,7 @@ void neural::calculateOutput()
         this->output[i] = this->output[i] + this->inputClass[k]->getData(j) * this->layerClass[this->layerPosition].getWeights(i,j);
         }
         this->output[i] += this->layerClass[this->layerPosition].getBias(i);
+        
         std::cout<<"Output from "<<i<<" is:"<<this->getOutput(i)<<std::endl;
         //save layer output in vector for later use
         //this need fix up other we need calculate how many neurons is in every layer
@@ -38,10 +39,18 @@ void neural::setInput()
   //make this read from file first inputs
   input *classInput = new input;
   this->inputClass.push_back(classInput);
-  this->inputClass[this->inputs]->setData(1);
-  this->inputClass[this->inputs]->setData(2);
-  this->inputClass[this->inputs]->setData(3);
-  this->inputClass[this->inputs]->setData(2.5);
+  // colors value
+  long double blue = 255;
+  long double red = 1;
+  long double green = 1;
+  long double one = 1;
+  // chance smaller
+  blue = one /blue;
+  red = one / red;
+  green = one / green;
+  this->inputClass[this->inputs]->setData(blue);
+  this->inputClass[this->inputs]->setData(red);
+  this->inputClass[this->inputs]->setData(green);
   this->inputs++;
 }
 
@@ -51,7 +60,19 @@ double neural::getOutput(int i)
 }
 
 void neural::runProgram()
-{
+{   //set filename to training
+    std::string trainingfilename="testi.txt";
+    //get answers for training
+    this->setAnswers(trainingfilename);
+    std::cout<<"working"<<std::endl;
+    for (int i= 0; i < this->getAnswersSize(); i++)
+    {
+      this->trainingAnswers.push_back(this->getAnswers(i));
+    }
+    for (int i=0; i < this->trainingAnswers[0].size(); i++)
+    {
+      std::cout<<trainingAnswers[0][i]<<std::endl;
+    }
     //set inputs
     this->setInput();
     //make first layer
@@ -64,7 +85,7 @@ void neural::runProgram()
     //this need old position of layer dont update yet
     this->setOutputToInput();
     //create new hidden layer inputClass[this->layerPosition]->getSize()
-    layer layer1(this->layerOutput[this->layerPosition].size(),2); //modify input class to abstract
+    layer layer1(this->layerOutput[this->layerPosition].size(),3); //modify input class to abstract
     this->layerClass.push_back(layer1);
      std::cout<<"start calculate layer output"<<std::endl;
     this->calculateLayerOutput();
@@ -105,3 +126,10 @@ void neural::calculateLayerOutput()
     }
   this->layerClass[this->layerPosition+1].testCout();
 }
+
+void neural::errorCorrection()
+{
+  //we need set correct answer where to aim
+
+}
+
