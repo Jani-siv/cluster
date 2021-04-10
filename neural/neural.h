@@ -19,6 +19,7 @@ private:
     std::vector<std::vector<input*>> layerInput;
     std::vector<std::vector<double>> trainingAnswers;
     int inputs = 0;
+    int error;
     //std::vector<double> inputs {1,2,3,2.5};
    // std::vector<std::vector<double>> weights {{0.2,0.8,-0.5,1.0},
      //                                         {0.5,-0.91,0.26,-0.5},
@@ -36,9 +37,6 @@ public:
     void setOutputToInput();
     void runProgram();
     void errorCorrection();
-    void setAnswers();
-    void openFile();
-    void saveCurrentToFile();
 };
 
 #endif
