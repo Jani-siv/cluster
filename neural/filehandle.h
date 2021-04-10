@@ -4,12 +4,16 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <stdlib.h>
+#include <sstream>
 
 class filehandle
 {
 private:
     std::string directory ="saved/";
     std::string filename = "";
+    std::vector<std::vector<double>> answers;
+    std::ifstream currentfile;
     int error;
 
     /* data */
@@ -18,8 +22,10 @@ public:
     ~filehandle();
     int openFile(std::string filename);
     void saveCurrentToFile(std::vector<std::vector<double>> *layer);
-    std::vector<double> setAnswers(std::string filename);
+    void setAnswers(std::string filename);
     void loadWeightsFromFile();
+    std::vector<double>getAnswers(int place);
+    int getAnswersSize();
 
 };
 

@@ -62,10 +62,17 @@ double neural::getOutput(int i)
 void neural::runProgram()
 {   //set filename to training
     std::string trainingfilename="testi.txt";
-    std::vector<double> temp;
     //get answers for training
-    temp = this->setAnswers(trainingfilename);
-    this->trainingAnswers.push_back(temp);
+    this->setAnswers(trainingfilename);
+    std::cout<<"working"<<std::endl;
+    for (int i= 0; i < this->getAnswersSize(); i++)
+    {
+      this->trainingAnswers.push_back(this->getAnswers(i));
+    }
+    for (int i=0; i < this->trainingAnswers[0].size(); i++)
+    {
+      std::cout<<trainingAnswers[0][i]<<std::endl;
+    }
     //set inputs
     this->setInput();
     //make first layer

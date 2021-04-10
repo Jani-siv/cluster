@@ -6,13 +6,13 @@ filehandle::filehandle(/* args */)
 
 filehandle::~filehandle()
 {
+    this->currentfile.close();
 }
 
 int filehandle::openFile(std::string filename)
 {
-std::fstream currentFile;
-currentFile.open(this->directory+filename,std::ios::in);
-if (!currentFile)
+this->currentfile.open(this->directory+filename,std::ios::in);
+if (!this->currentfile)
 {
     std::cout<<"error cannot open file"<<this->directory+filename<<std::endl;
     return -1;
@@ -20,7 +20,6 @@ if (!currentFile)
 else {
     std::cout<<"file opened for reading"<<std::endl;
     return 0;
-    currentFile.close();
 }
 return -2;
 //open file
@@ -34,14 +33,33 @@ void filehandle::loadWeightsFromFile()
 {
     //load saved
 }
-std::vector<double> filehandle::setAnswers(std::string filename)
+void filehandle::setAnswers(std::string filename)
 {
+    //test file
     this->error = this->openFile(filename);
-    //transform to read from file
-    std::vector<double> answer;
-    answer.push_back(1);
-    answer.push_back(0);
-    answer.push_back(0);
-    return answer;
-    //set answers for training
+    if (this->error == 0)
+    {
+        std::string output;
+        while (getline (this->currentfile, output))
+        {
+            std::vector<double> oneTraining;
+            std::stringstream templine (output);
+                while(getline (templine,output,','))
+                {
+                    double tempVariable = std::atof(output.c_str());        
+                    oneTraining.push_back(tempVariable);
+                }
+        this->answers.push_back(oneTraining);
+        }
+    }
+    
+}
+int filehandle::getAnswersSize()
+{
+    return this->answers.size();
+}
+
+std::vector<double> filehandle::getAnswers(int place)
+{
+    return this->answers[place];
 }
