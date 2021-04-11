@@ -71,3 +71,12 @@ int layer::getSizeColumns(int i)
 {
 return weight[i].size();
 }
+
+std::vector<long double> layer::getWeights(int position)
+{
+return this->weight[position];
+}
+int layer::getAmountWeights()
+{
+    return this->weight.size();
+}
