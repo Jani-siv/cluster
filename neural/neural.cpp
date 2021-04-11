@@ -89,6 +89,17 @@ void neural::runProgram()
     this->layerClass.push_back(layer1);
      std::cout<<"start calculate layer output"<<std::endl;
     this->calculateLayerOutput();
+    //i is layer
+    for (int i=0; i < this->layerClass.size(); i++)
+    {
+      //k is node
+      for (int k=0; k < this->layerClass[i].getAmountWeights(); k++)
+      {
+        double bias = this->layerClass[i].getBias(k);
+        std::string filename = "testSave.txt";
+        this->saveWeightsToFile(this->layerClass[i].getWeights(k),i,k,bias,filename);
+      }
+    }
     this->layerPosition++;
     
     // set output to input

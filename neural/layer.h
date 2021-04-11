@@ -23,6 +23,8 @@ public:
     long double getBias(int i);
     int getSizeRows();
     int getSizeColumns(int i);
+    std::vector<long double> getWeights(int position);
+    int getAmountWeights();
     
 
 };
